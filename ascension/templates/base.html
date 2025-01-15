@@ -21,27 +21,62 @@
         <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
 
         <!-- my style -->
-        <link rel="stylesheet" href="{% static 'css/mystyle.css' %}" type='text/css'>
+        <link rel="stylesheet" type='text/css' href="{% static 'css/mystyle.css' %}">
         {% block head %}{% endblock head %}
     </head>
-    <body>
+    <body id='page-top'>
         <div id='wrapper'>
             <!-- Navigation-->
             <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav">
                 <div class="container px-4 px-lg-5">
-                    <a class="navbar-brand" href="#page-top">ASCENSION</a>
-                    <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                    <a class="navbar-brand text-black" href="{% url 'ascension:index' %}">ASCENSION</a>
+                    <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
                     <div class="collapse navbar-collapse" id="navbarResponsive">
                         <ul class="navbar-nav ms-auto my-2 my-lg-0">
-                            <li class="nav-item"><a class="nav-link" href="#">About</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#サインアップurl">Sign Up</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#ログインurl">Log In</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#問い合わせフォームurl">Inquiry</a></li>
+                            {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link text-black" href="{% url 'account_logout' %}">
+                                    Log Out
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link text-black" href="{% url 'account_signup' %}">
+                                    Sign Up
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-black" href="{% url 'account_login' %}">
+                                    Log In
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li class="nav-item">
+                                <a class="nav-link text-black" href="{% url 'ascension:inquiry' %}">
+                                    Inquiry
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>
             </nav>
-            
+
+            {% if messages %}
+            <div class='container my-div-style'>
+                <dir class='row'>
+                    <ul class='messages' style='list-style-type: none;'>
+                        {% for message in messages %}
+                        <li {% if message.tags %} class='{{ message.tags }}'{% endif %}>
+                            {{ message }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </dir>
+            </div>
+            {% endif %}
+
             {% block header %}{% endblock header %}
             {% block contents %}{% endblock contents %}
 

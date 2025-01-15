@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}学びで自身のステージを上げる|ASCENSION{% endblock title %}
+{% block title %}学びで人生のステージを上げる|ASCENSION{% endblock title %}
 
 {% block header %}
 <!-- Masthead-->
@@ -16,7 +16,12 @@
                 <p class="text-white-75 mb-5">
                     あなた専用の学習サービス
                 </p>
-                <a class="btn btn-primary btn-xl" href="#">Log In</a>
+                {% if user.is_authenticated %}
+                {% else %}
+                <a class="btn btn-primary btn-xl" href="{% url 'account_login' %}">
+                    Log In
+                </a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -36,7 +41,12 @@
                 <p class="text-white-75 mb-4">
                     学びで自身のステージを上げよう。
                 </p>
-                <a class="btn btn-light btn-xl" href="#サインアップurl">Sign Up</a>
+                {% if user.is_authenticated %}
+                {% else %}
+                <a class="btn btn-light btn-xl" href="{% url 'account_signup' %}">
+                    Sign Up
+                </a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -91,6 +101,3 @@
     </div>
 </section>
 {% endblock contents %}
-
-
-
