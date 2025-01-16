@@ -1,5 +1,6 @@
 import os
 from django.contrib.messages import constants as messages
+from dotenv import load_dotenv
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -9,8 +10,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-cnu=x+85+l59rh8g4i2ll6v&6py55l(o54j_ul+j6q)h2a8a3y'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -30,6 +29,7 @@ INSTALLED_APPS = [
 
     'ascension.apps.AscensionConfig',
     'accounts.apps.AccountsConfig',
+    'analytics.apps.AnalyticsConfig',
 
     # サイトフレームワーク（django-allauthで必須）
     'django.contrib.sites',
@@ -195,7 +195,7 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = True
 
 # ログイン・ログアウト後の推移先
-LOGIN_REDIRECT_URL = 'ascension:index'
+LOGIN_REDIRECT_URL = 'ascension:interest_list'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
 
 # ログアウトリンクのクリック１回でログアウト
@@ -206,3 +206,9 @@ ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
 
 # デフォルトのメール送信元を設定
 DEFAULT_FROM_EMAIL = os.environ.get('FROM_EMAIL')
+
+load_dotenv(os.path.join(BASE_DIR, '.env'))
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY is not set in the .env file!")

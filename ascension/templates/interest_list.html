@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}興味分野|ASCENSION{% endblock title %}
+{% block active_interest_list %}active{% endblock active_interest_list %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/clean-blog.css' %}">
+{% endblock head %}
+
+{% block contents %}
+<div class='container px-4 px-lg-5 my-div-style'>
+    <div class='row gx-4 gx-lg-5 justify-content-center'>
+        <div class="col-md-10 col-lg-8 col-xl-7">
+            <div>
+                <h1>{{ request.user.username }}さんの興味分野</h1>
+            </div>
+            {% for interest_category in interestcategory_list %}
+                <div class='post-preview'>
+                    <a href="{% url 'ascension:learning_goal_by_category' category_id=interest_category.id %}">
+                        <h2 class='post-title'>
+                            {{ interest_category.name }}
+                        </h2>
+                    </a>
+                    <hr class='my-4'>
+                </div>
+            {% empty %}
+                <p>興味分野がありません。</p>
+            {% endfor %}
+            <div class="d-flex justify-content-end mb-4">
+                <a class='btn btn-primary float-right' href="#">追加</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock contents %}

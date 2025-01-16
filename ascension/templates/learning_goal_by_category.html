@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}学習目標|ASCENSION{% endblock title %}
+{% block active_learning_goal %}{% endblock active_learning_goal %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/clean-blog.html' %}">
+{% endblock head %}
+
+{% block contents %}
+<div class='container px-4 px-lg-5 my-div-style'>
+    <div class='row gx-4 gx-lg-5 justify-content-center'>
+        <div class="col-md-10 col-lg-8 col-xl-7">
+            <div>
+                <h1>{{ request.user.username }}さんの学習目標</h1>
+                <h2>〜{{ category.name }}〜</h2>
+            </div>
+            {% for learning_goal in learning_goals %}
+                <div class='post-preview'>
+                    <a href="#">
+                        <h2 class='post-title'>
+                            {{ learning_goal.title }}
+                        </h2>
+                        <p>{{ learning_goal.description }}</p>
+                    </a>
+                    <hr class='my-4'>
+                </div>
+            {% empty %}
+                <p>{{ category }}の学習目標がありません。</p>
+            {% endfor %}
+            <div class="d-flex justify-content-end mb-4">
+                <a class='btn btn-primary float-right' href="{% url 'ascension:create_learning_goal' %}">新規作成</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock contents %}

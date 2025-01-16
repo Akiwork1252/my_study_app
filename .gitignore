@@ -4,6 +4,7 @@
 *.pyc
 *.jpg
 *.ico
+.env
 .vscode/
 __pycache__/
 local_settings.py
