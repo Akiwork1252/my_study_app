@@ -37,7 +37,6 @@ class LearningPlan(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     lerning_goal = models.ForeignKey(LearningGoal, on_delete=models.CASCADE)
     topic = models.CharField(max_length=200)
-    completed = models.BooleanField(default=False)
-
+   
     def __str__(self):
         return self.topic
