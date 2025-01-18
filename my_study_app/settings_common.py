@@ -1,6 +1,6 @@
 import os
 from django.contrib.messages import constants as messages
-from dotenv import load_dotenv
+from decouple import config
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'ascension.apps.AscensionConfig',
     'accounts.apps.AccountsConfig',
     'analytics.apps.AnalyticsConfig',
+    'ai_support.apps.AiSupportConfig',
 
     # サイトフレームワーク（django-allauthで必須）
     'django.contrib.sites',
@@ -207,8 +208,8 @@ ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
 # デフォルトのメール送信元を設定
 DEFAULT_FROM_EMAIL = os.environ.get('FROM_EMAIL')
 
-load_dotenv(os.path.join(BASE_DIR, '.env'))
+SECRET_KEY = config('SECRET_KEY')
 
-SECRET_KEY = os.getenv('SECRET_KEY')
-if not SECRET_KEY:
-    raise ValueError("SECRET_KEY is not set in the .env file!")
+DEBUG = config('DEBUG', default=False, cast=bool)
+
+OPENAI_API_KEY = config('OPENAI_API_KEY')

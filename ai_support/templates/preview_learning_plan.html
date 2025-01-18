@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}学習プランの確認|ASCENSION{% endblock title %}
+{% block active_preview_learning_plan %}active{% endblock active_preview_learning_plan %}
+
+{% block contents %}
+<div class='container d-flex justify-content-center'>
+    <div class='my-div-style col-12 col-md-7'>
+        <h2>学習プランの確認</h2>
+        <h4>不要なトピックがあればチェックを外してください。決定を押すと学習プランが作成されます。</h3>
+        <form method="POST" action="{% url 'ascension:save_selected_plan' learning_goal_id=learning_goal_id %}">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            
+            {% for item in generated_plan %}
+            <div class='mb-4'>
+                <label for="{{ field.id_for_label }}" class='form-label'>
+                    <strong>{{ field.label_tag }}</strong>
+                </label>
+                <input type="checkbox" name='selected_topics' value={{ item.topic }} checked>
+                {{ item.topic }}
+                {{ field.errors }}
+            </div>
+            {% endfor %}
+            <button class='btn btn-primary' type='submit'>決定</button>
+        </form>
+    </div>
+</div>
+{% endblock contents %}

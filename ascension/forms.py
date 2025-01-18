@@ -60,16 +60,16 @@ class CreateLearningGoalForm(forms.ModelForm):
             'title': forms.Textarea(attrs={
                 'rows': 1,
                 'class': 'form-control',
-                'placeholder': '学習テーマをここに入力してください。'
+                'placeholder': '学習テーマをここに入力してください。(例:Python)'
             }),
             'current_level': forms.Textarea(attrs={
                 'rows': 2,
                 'class': 'form-control',
-                'placeholder': 'テーマに関する現在の自身のレベル感を入力することで、より最適な学習プランを作成できます。'
+                'placeholder': '現在のレベルをここに入力することで、より最適な学習プランを作成できます。(例:未経験)'
             }),
             'description': forms.Textarea(attrs={
                 'rows': 6,
                 'class': 'form-control',
-                'placeholder': 'テーマに関する詳細な説明を入力することで、より最適な学習プランを作成できます。(目的や到達レベルなど)'
+                'placeholder': '目的や目標レベルなどの説明を入力することで、より最適な学習プランを作成できます。(例:株価予測がしたい。)'
             })
         }

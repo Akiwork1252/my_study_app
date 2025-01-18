@@ -8,29 +8,28 @@
 <link rel="stylesheet" href="{% static 'css/clean-blog.css' %}">
 {% endblock head %}
 
-{% block body_class %}scrollable-page{% endblock body_class %}
-
 {% block contents %}
 <div class='container px-4 px-lg-5 my-div-style'>
-    <div>
-        <h1 class='h-25'>{{ request.user.username }}さんの興味分野</h1>
-    </div>
     <div class='row gx-4 gx-lg-5 justify-content-center'>
         <div class="col-md-10 col-lg-8 col-xl-7">
-            {% for interest_category in interestcategory_list %}
+            <div>
+                <h1>{{ request.user.username }}</h1>
+                {% if  learningplan_list %}
+                    <h2>{{ learningplan_list.0.learning_goal.title }}の学習プラン</h2>
+                {% endif %}
+            </div>
+            {% for learning_plan in learningplan_list %}
                 <div class='post-preview'>
-                    <a href="{% url 'ascension:learning_goal_by_category' category_id=interest_category.id %}">
-                        <h2 class='post-title'>
-                            {{ interest_category.name }}
-                        </h2>
-                    </a>
+                    <h3 class='post-title'>
+                        {{ learning_plan.topic }}
+                    </h3>
                     <hr class='my-4'>
                 </div>
             {% empty %}
-                <p>興味分野がありません。</p>
+                <p>学習プランがありません。</p>
             {% endfor %}
             <div class="d-flex justify-content-end mb-4">
-                <a class='btn btn-primary float-right' href="#">追加</a>
+                <a class='btn btn-primary float-right' href="#学習アプリに移行">講義を受ける</a>
             </div>
         </div>
     </div>
