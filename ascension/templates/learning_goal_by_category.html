@@ -8,7 +8,6 @@
 <link rel="stylesheet" href="{% static 'css/clean-blog.css' %}">
 {% endblock head %}
 
-{% block body_class %}scrollable-page{% endblock body_class %}
 
 {% block contents %}
 <div class='container px-4 px-lg-5 my-div-style'>
@@ -19,7 +18,7 @@
         <div class="col-md-10 col-lg-8 col-xl-7">
             {% for learning_goal in learning_goals %}
                 <div class='post-preview'>
-                    <a href="#">
+                    <a href="{% url 'ascension:learning_plan_list'  learning_goal_id=learning_goal.id %}">
                         <h2 class='post-title'>
                             {{ learning_goal.title }}
                         </h2>
