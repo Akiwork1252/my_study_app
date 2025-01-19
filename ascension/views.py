@@ -5,8 +5,8 @@ from django.urls import reverse_lazy, reverse
 from django.views import View, generic
 from django.shortcuts import render, get_object_or_404, redirect
 
-from .forms import InquiryForm, CreateLearningGoalForm
-from .models import InterestCategory, LearningGoal, LearningPlan
+from .forms import InquiryForm, CreateLearningGoalForm, AddInterestCategoryForm
+from .models import InterestCategory, LearningGoal, LearningPlan, UserInterest
 
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ class IndexView(generic.TemplateView):
 
 
 # 問い合わせフォーム
-class InquiryViwe(generic.FormView):
+class InquiryView(generic.FormView):
     template_name = 'inquiry.html'
     form_class = InquiryForm
     success_url = reverse_lazy('ascension:inquiry')
@@ -48,9 +48,24 @@ class InterestListView(LoginRequiredMixin, generic.ListView):
 
 
 # 興味分野の追加
-class AddInterestCategoryView(LoginRequiredMixin, generic.CreateView):
-    model = InterestCategory
-    template_name = 'add_interest_category'
+class AddInterestCategoryView(LoginRequiredMixin, generic.FormView):
+    form_class = AddInterestCategoryForm
+    template_name = 'add_interest_category.html'
+    success_url = reverse_lazy('ascension:interest_list')
+
+    def form_valid(self, form):
+        # フォームから選択されたカテゴリーを取得
+        selected_category = form.cleaned_data['category']
+        # InterestCategoryを取得or作成
+        interest_category, created = InterestCategory.objects.get_or_create(
+            name=selected_category.name
+        )
+        # 関連付け
+        UserInterest.objects.get_or_create(
+            user=self.request.user,
+            category=interest_category
+        )
+        return super().form_valid(form)
 
 
 # 学習目標の表示
@@ -70,7 +85,7 @@ class LearningGoalByCategoryView(LoginRequiredMixin, generic.ListView):
         return context
 
 
-# 学習目標の作成
+# 学習目標の作成(一次)
 class CreateLearningGoal(LoginRequiredMixin, generic.CreateView):
     model = LearningGoal
     form_class = CreateLearningGoalForm
@@ -92,7 +107,7 @@ class CreateLearningGoal(LoginRequiredMixin, generic.CreateView):
     def get_success_url(self):
         return reverse('ai_support:generate_plan_preview', kwargs={'learning_goal_id': str(self.object.id)})
 
-# 学習目標の決定
+# 学習プランの保存
 class SaveSelectedLearningPlanView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         selected_topics = request.POST.getlist('selected_topics')
@@ -108,12 +123,12 @@ class SaveSelectedLearningPlanView(LoginRequiredMixin, View):
                 learning_goal=learning_goal,
                 topic=topic
             )
-        return redirect('learning_plan_list',learning_goal_id=learning_goal.id)
+        return redirect('ascension:learning_plan_list',learning_goal_id=learning_goal.id)
 
 # 学習目標の表示
 class LearningPlanListView(LoginRequiredMixin, generic.ListView):
     model = LearningPlan
-    template_engine = 'learning_plan_list.html'
+    template_name = 'learning_plan_list.html'
 
     def get_queryset(self):
         learning_goal_id = self.kwargs.get('learning_goal_id')

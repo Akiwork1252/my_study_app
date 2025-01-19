@@ -11,3 +11,18 @@ footer {
 .my-div-style {
     margin-top: 6rem;
 }
+
+.status-circle {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-true {
+    background-color: rgb(131, 18, 63);
+}
+
+.status-false {
+    background-color: rgb(44, 94, 186);
+}

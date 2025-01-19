@@ -11,13 +11,12 @@
         <form method="POST" action="{% url 'ascension:save_selected_plan' learning_goal_id=learning_goal_id %}">
             {% csrf_token %}
             {{ form.non_field_errors }}
-            
             {% for item in generated_plan %}
             <div class='mb-4'>
                 <label for="{{ field.id_for_label }}" class='form-label'>
                     <strong>{{ field.label_tag }}</strong>
                 </label>
-                <input type="checkbox" name='selected_topics' value={{ item.topic }} checked>
+                <input type="checkbox" name='selected_topics' value="{{ item.topic }}" checked>
                 {{ item.topic }}
                 {{ field.errors }}
             </div>

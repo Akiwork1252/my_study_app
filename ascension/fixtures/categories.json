@@ -1,0 +1,51 @@
+[
+    {
+      "model": "ascension.category",
+      "fields": {
+        "name": "IT"
+      }
+    },
+    {
+        "model": "ascension.category",
+        "fields": {
+          "name": "経済"
+        }
+      },
+      {
+        "model": "ascension.category",
+        "fields": {
+          "name": "金融"
+        }
+      },
+      {
+        "model": "ascension.category",
+        "fields": {
+          "name": "ビジネス"
+        }
+      },
+      {
+        "model": "ascension.category",
+        "fields": {
+          "name": "医療"
+        }
+      },
+      {
+        "model": "ascension.category",
+        "fields": {
+          "name": "語学"
+        }
+      },
+      {
+        "model": "ascension.category",
+        "fields": {
+          "name": "教養"
+        }
+      },
+      {
+        "model": "ascension.category",
+        "fields": {
+          "name": "その他"
+        }
+      }
+  ]
+  
