@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "ascension/base.html" %}
 {% load static %}
 
 {% block title %}興味分野|ASCENSION{% endblock title %}
@@ -6,29 +6,31 @@
 
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/clean-blog.css' %}">
-<link rel="stylesheet" href="{% static 'css/mystyle.css' %}">
 {% endblock head %}
+
+{% block body_class %}scrollable-page{% endblock body_class %}
 
 {% block contents %}
 <div class='container px-4 px-lg-5 my-div-style'>
     <div>
-        <h1>{{ request.user.username }}〜{{ learningplan_list.0.learning_goal.title }}の学習プラン〜</h1>
+        <h1 class='h-25'>{{ request.user.username }}さんの興味分野</h1>
     </div>
     <div class='row gx-4 gx-lg-5 justify-content-center'>
         <div class="col-md-10 col-lg-8 col-xl-7">
-            {% for learning_plan in learningplan_list %}
+            {% for interest_category in interestcategory_list %}
                 <div class='post-preview'>
-                    <h3 class='post-title'>
-                        <span class="status-circle {% if learning_plan.completed %}status-true{% else %}status-false{% endif %}"></span>
-                        {{ learning_plan.topic }}
-                    </h3>
+                    <a href="{% url 'ascension:learning_goal_by_category' category_id=interest_category.id %}">
+                        <h2 class='post-title'>
+                            {{ interest_category.name }}
+                        </h2>
+                    </a>
                     <hr class='my-4'>
                 </div>
             {% empty %}
-                <p>学習プランがありません。</p>
+                <p>興味分野がありません。</p>
             {% endfor %}
             <div class="d-flex justify-content-end mb-4">
-                <a class='btn btn-primary float-right' href="#学習アプリに移行">講義を受ける</a>
+                <a class='btn btn-primary float-right' href="{% url 'ascension:add_interest_category' %}">追加</a>
             </div>
         </div>
     </div>

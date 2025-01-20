@@ -1,15 +1,15 @@
-{% extends "base.html" %}
+{% extends "ascension/base.html" %}
 
-{% block title %}学習目標作成|ASCENSION{% endblock title %}
-{% block active_create_learning_goal %}active{% endblock active_create_learning_goal %}
+{% block title %}問い合わせ|ASCENSIOM{% endblock title %}
+{% block active_inquiry %}active{% endblock active_inquiry %}
 
 {% block contents %}
 <div class='container d-flex justify-content-center'>
     <div class='my-div-style col-12 col-md-7'>
-        <form method="POST" action="{% url 'ascension:create_learning_goal' category_id=category.id %}">
+        <form method="POST" action="{% url 'ascension:inquiry' %}">
             {% csrf_token %}
             {{ form.non_field_errors }}
-            
+
             {% for field in form %}
             <div class='mb-4'>
                 <label for="{{ field.id_for_label }}" class='form-label'>
@@ -19,10 +19,8 @@
                 {{ field.errors }}
             </div>
             {% endfor %}
-            <button class='btn btn-primary' type='submit'>追加</button>
+            <button class='btn btn-primary' type='submit'>送信</button>
         </form>
     </div>
 </div>
 {% endblock contents %}
-
-

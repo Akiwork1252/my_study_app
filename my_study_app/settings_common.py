@@ -31,6 +31,8 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'analytics.apps.AnalyticsConfig',
     'ai_support.apps.AiSupportConfig',
+    'learning.apps.LearningConfig',
+    'learning_test.apps.LearningTestConfig',
 
     # サイトフレームワーク（django-allauthで必須）
     'django.contrib.sites',
