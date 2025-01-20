@@ -1,0 +1,86 @@
+{% extends "ascension/base.html" %}
+{% load static %}
+
+{% block title %}レクチャー|ASCENSION{% endblock title %}
+{% block active_lecture %}active{% endblock active_lecture %}
+
+{% block contents %}
+<div class='container d-flex justify-content-center'>
+    <div class='my-div-style col-12 col-md-7'>
+        <div id='chat-box' class='border p-3 mb-3' style='height: 400px; overflow-y: auto;'>
+            <div class='text-start mb-2'>
+                <strong>AI:</strong>
+                {{ initial_ai_message }}
+            </div>
+        </div class="d-flex justify-content-end">
+        <form id='chat-form' action="">
+            <input type="text" id='message-input' class='form-control mb-2' placeholder='メッセージを入力' required>
+            <div>
+                <button type='submit' class='btn btn-primary float-right'>送信</button>
+                <button type='button' id='end-lecture' class='btn btn-primary float-right'>終了</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const chatForm = document.getElementById('chat-form');
+    const chatBox = document.getElementById('chat-box');
+    const messageInput = document.getElementById('message-input');
+    const endLectureButton = document.getElementById('end-lecture');
+
+    // チャット送信
+    chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const userMessage = messageInput.value;
+
+        // ユーザーのメッセージを表示
+        const userDiv = document.createElement('div');
+        userDiv.textContent = `ユーザー: ${userMessage}`;
+        userDiv.classList.add('text-end', 'mb-2');
+        chatBox.appendChild(userDiv);
+
+        // サーバーにメッセージを送信
+        fetch("{% url 'learning:lecture_chat' learning_plan.id %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: new URLSearchParams({ message: userMessage })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // AIの応答を表示
+            const aiDiv = document.createElement('div');
+            aiDiv.textContent = `AI: ${data.lecture_response}`;
+            aiDiv.classList.add('text-start', 'mb-2');
+            chatBox.appendChild(aiDiv);
+
+            // チャットボックスをスクロール
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // 入力欄をクリア
+            messageInput.value = '';
+        });
+    });
+
+    // 講義終了
+    endLectureButton.addEventListener('click', function() {
+        fetch("{% url 'learning:lecture_chat' learning_plan.id %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: new URLSearchParams({ message: "終了" })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.redirect_url) {
+                window.location.href = data.redirect_url;
+            }
+        });
+    });
+</script>
+{% endblock contents %}

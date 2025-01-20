@@ -22,12 +22,12 @@ class OnlyYouMixin(UserPassesTestMixin):
 
 # トップ画面
 class IndexView(generic.TemplateView):
-    template_name = 'index.html'
+    template_name = 'ascension/index.html'
 
 
 # 問い合わせフォーム
 class InquiryView(generic.FormView):
-    template_name = 'inquiry.html'
+    template_name = 'ascension/inquiry.html'
     form_class = InquiryForm
     success_url = reverse_lazy('ascension:inquiry')
 
@@ -41,7 +41,7 @@ class InquiryView(generic.FormView):
 # 興味分野の表示
 class InterestListView(LoginRequiredMixin, generic.ListView):
     model = InterestCategory
-    template_name = 'interest_list.html'
+    template_name = 'ascension/interest_list.html'
 
     def get_queryset(self):
         return InterestCategory.objects.prefetch_related('users').filter(users=self.request.user)
@@ -50,7 +50,7 @@ class InterestListView(LoginRequiredMixin, generic.ListView):
 # 興味分野の追加
 class AddInterestCategoryView(LoginRequiredMixin, generic.FormView):
     form_class = AddInterestCategoryForm
-    template_name = 'add_interest_category.html'
+    template_name = 'ascension/add_interest_category.html'
     success_url = reverse_lazy('ascension:interest_list')
 
     def form_valid(self, form):
@@ -71,7 +71,7 @@ class AddInterestCategoryView(LoginRequiredMixin, generic.FormView):
 # 学習目標の表示
 class LearningGoalByCategoryView(LoginRequiredMixin, generic.ListView):
     model = LearningGoal
-    template_name = 'learning_goal_by_category.html'
+    template_name = 'ascension/learning_goal_by_category.html'
     context_object_name = 'learning_goals'
 
     def get_queryset(self):
@@ -89,7 +89,7 @@ class LearningGoalByCategoryView(LoginRequiredMixin, generic.ListView):
 class CreateLearningGoal(LoginRequiredMixin, generic.CreateView):
     model = LearningGoal
     form_class = CreateLearningGoalForm
-    template_name = 'create_learning_goal.html'
+    template_name = 'ascension/create_learning_goal.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -128,10 +128,23 @@ class SaveSelectedLearningPlanView(LoginRequiredMixin, View):
 # 学習目標の表示
 class LearningPlanListView(LoginRequiredMixin, generic.ListView):
     model = LearningPlan
-    template_name = 'learning_plan_list.html'
+    template_name = 'ascension/learning_plan_list.html'
 
     def get_queryset(self):
         learning_goal_id = self.kwargs.get('learning_goal_id')
         return LearningPlan.objects.filter(user=self.request.user, 
                                            learning_goal_id=learning_goal_id
                                            )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        learning_goal_id = self.kwargs.get('learning_goal_id')
+        context['learning_goal_id'] = learning_goal_id
+        first_incomplete_plan = LearningPlan.objects.filter(
+            user=self.request.user,
+            learning_goal_id=learning_goal_id,
+            completed=False
+        ).order_by('id').first()
+        context['learning_plan_id'] = first_incomplete_plan.id if first_incomplete_plan else None
+        return context
+    

@@ -1,6 +1,10 @@
 import os
 import json
 from openai import OpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+from langchain.schema import HumanMessage
+
 from django.conf import settings
 
 
@@ -49,5 +53,45 @@ def generate_learning_plan(title, current_level, description):
     return generated_plan
 
 
+# ハンズオン講義用
+def generate_lecture_content(topic, user_input, all_topic_completed=False):
+    if not user_input:
+        return f'"{topic}" に関する講義を始めます。何か質問があれば教えてください。'
+    if all_topic_completed:
+        return f'"{topic}" に関する講義は以上です。質問がなければ終了を押してください。'
+    
+    # print(f"Generating lecture content for topic: {topic}, user input: {user_input}")
+    llm = ChatOpenAI(temperature=0.7)
+    prompt_template = ChatPromptTemplate.from_template(
+        'あなたは教師であり、ユーザーはあなたの生徒です。以下のトピックに基づいてハンズオン形式で講義を行ってください。\n'
+        'トピック: {topic}\n'
+        'ユーザーの応答: {user_input}\n'
+        '次の内容を出力してください。'
+    )
+
+    prompt = prompt_template.format_prompt(topic=topic, user_input=user_input)
+    # print(f"Generated prompt: {prompt.to_string()}")
+    response = llm.invoke(prompt.to_string())
+    # print(f"Response received: {response.content}")
+    return response.content
+
+
+# 選択問題を生成
+def generate_multiple_choice_questions(topic, user_input):
+    if not user_input:
+        return 'これまでに学んだ範囲で、選択問題を生成して出題します。回答を入力してください。'
+    
+
+# コーデイング問題を生成
+def generate_coding_questions(topic, user_input):
+    if not user_input:
+        return 'これまでに学んだ範囲で、コーディング問題を生成します。回答を入力してください。'
+    
+
+
 if __name__ == '__main__':
-    print(generate_learning_plan('Jave', '未経験', ''))
+    # print(generate_learning_plan('Jave', '未経験', ''))
+    lecture = generate_lecture_content('python基礎構文(データ型)', '')
+    print(lecture)
+
+
