@@ -2,12 +2,13 @@ from django.db import models
 from django.utils import timezone
 
 from accounts.models import CustomUser
-from ascension.models import LearningPlan
+from ascension.models import LearningPlan, LearningGoal
 
 
 # 学習進捗管理
 class Progress(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    learning_goal = models.ForeignKey(LearningGoal, on_delete=models.CASCADE, null=True, blank=True)
     learning_plan = models.ForeignKey(LearningPlan, on_delete=models.CASCADE)
     status = models.CharField(max_length=20,
                               choices=[
