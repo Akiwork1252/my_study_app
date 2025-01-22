@@ -10,7 +10,7 @@
 {% endblock head %}
 
 {% block contents %}
-<div class='container px-4 px-lg-5 my-div-style'>
+<div class='container-fluid px-4 px-lg-5 my-div-style'>
     <div>
         <h1>{{ request.user.username }}〜{{ learningplan_list.0.learning_goal.title }}の学習プラン〜</h1>
     </div>
@@ -18,8 +18,6 @@
         <div class="col-md-10 col-lg-8 col-xl-7">
             {% if  learning_plan_id %}
                 <div class="d-flex justify-content-end mb-4">
-                    <a class='btn btn-primary float-right me-2' href="{% url 'learning_test:learning_test' learning_goal_id %}">選択問題</a>
-                    <a class='btn btn-primary float-right me-2' href="{% url 'learning_test:learning_test' learning_goal_id %}">コーディング問題</a>
                     <a class='btn btn-primary float-right' href="{% url 'learning:lecture_chat' learning_plan_id %}">講義を受ける</a>
                 </div>
             {% else %}
@@ -30,19 +28,18 @@
                     <h3 class='post-title'>
                         <span class="status-circle {% if learning_plan.completed %}status-true{% else %}status-false{% endif %}"></span>
                         {{ learning_plan.topic }}
+                        <a class='btn btn-sm btn-primary float-right me-2' href="{% url 'learning_test:choice_test' learning_plan.learning_goal.id %}?topic={{ learning_plan.topic|urlencode }}">
+                            選択問題
+                        </a>
+                        <a class='btn btn-sm btn-primary float-right me-2' href="{% url 'learning_test:written_test' learning_plan.learning_goal.id %}?topic={{ learning_plan.topic|urlencode }}">
+                            記述問題
+                        </a>
                     </h3>
                     <hr class='my-4'>
                 </div>
             {% empty %}
                 <p>学習プランがありません。</p>
             {% endfor %}
-            {% if  learning_plan_id %}
-                <div class="d-flex justify-content-end mb-4">
-                    <a class='btn btn-primary float-right' href="{% url 'learning:lecture_chat' learning_plan_id %}">講義を受ける</a>
-                </div>
-            {% else %}
-                <p>未完了の学習プランがありません。</p>
-            {% endif %}
         </div>
     </div>
 </div>

@@ -1,0 +1,88 @@
+{% extends "ascension/base.html" %}
+{% load static %}
+
+{% block title %}テスト|ASCENSION{% endblock title %}
+{% block active_lecture %}active{% endblock active_lecture %}
+
+{% block contents %}
+<div class='container d-flex justify-content-center'>
+    <div class='my-div-style col-12 col-md-7'>
+        <div id='chat-box' class='border p-3 mb-3' style='height: 400px; overflow-y: auto;'>
+            <div class='text-start mb-2'>
+                <strong>AI:</strong>
+                {{ question|linebreaks }}
+            </div>
+            <form method="POST" action="{% url 'learning_test:choice_test' learning_goal_id %}">
+                {% csrf_token %}
+            </form>
+        </div class="d-flex justify-content-end">
+        <form id='chat-form' action="">
+            {% csrf_token %}
+            <input type="text" id='message-input' class='form-control mb-2' placeholder='回答を入力' required>
+            <div>
+                <button type='submit' class='btn btn-primary float-right'>回答</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrfToken = getCookie('csrftoken');
+    const learningTestURL = "{% url 'learning_test:choice_test' learning_goal_id %}";
+
+    let questionCount = 1;
+    let totalScore = 0;
+
+    const chatForm = document.getElementById('chat-form');
+    const chatBox = document.getElementById('chat-box');
+    const messageInput = document.getElementById('message-input');
+
+    chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const userMessage = messageInput.value;
+
+        // ユーザーメッセージ
+        chatBox.innerHTML += `<div><strong>あなた:</strong> ${userMessage}</div>`;
+        fetch(`${learningTestURL}?question_count=${questionCount}&total_score=${totalScore}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": csrfToken
+            },
+            body: new URLSearchParams({ message: userMessage })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.redirect_url) {
+                chatBox.innerHTML += `<div><strong>AI:</strong> 総合スコア: ${data.score}</div>`;
+                window.location.href = data.redirect_url;
+            } else if (data.next_question) {
+                // スコアと解説
+                chatBox.innerHTML += `<div><strong>スコア:</strong> ${data.score}</div>`;
+                chatBox.innerHTML += `<div><strong>解説:</strong> ${data.explanation}</div>`;
+                // 次の問題を表示
+                chatBox.innerHTML += `<div><strong>AI:</strong> ${data.next_question}</div>`;
+                questionCount += 1;
+                totalScore = data.total_score;
+            } else if (data.error) {
+                console.error(data.error);
+            }
+            messageInput.value = '';
+        });
+    });
+</script>
+{% endblock contents %}

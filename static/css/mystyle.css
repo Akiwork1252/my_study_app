@@ -26,3 +26,11 @@ footer {
 .status-false {
     background-color: rgb(44, 94, 186);
 }
+
+.test-btn1 {
+    color:rgb(18, 131, 39)
+}
+
+.test-btn2 {
+    color: rgb(255, 0, 106)
+}
