@@ -12,4 +12,6 @@ urlpatterns = [
     path('learning-goal/<int:category_id>/create/', views.CreateLearningGoal.as_view(), name='create_learning_goal'),
     path('save-plan/<int:learning_goal_id>/', views.SaveSelectedLearningPlanView.as_view(), name='save_selected_plan'),
     path('learning-plan-list/<int:learning_goal_id>/', views.LearningPlanListView.as_view(), name='learning_plan_list'),
+    path('category_unlink/<int:category_id>', views.CategoryUnlinkView.as_view(), name='category_unlink'),
+    path('learning_goal_delete/<int:learning_goal_id>', views.LearningGoalDeleteView.as_view(), name='learning_goal_delete'),
 ]

@@ -17,8 +17,9 @@ class GenerateLearningPlanPreviewView(LoginRequiredMixin, View):
             current_level=learning_goal.current_level,
             description=learning_goal.description,
         )
-        return render(request, 'preview_learning_plan.html', 
+        return render(request, 'ai_support/preview_learning_plan.html', 
                       {'generated_plan': generated_plan,
                        'learning_goal': learning_goal,
                        'learning_goal_id': learning_goal_id,
                        })
+
