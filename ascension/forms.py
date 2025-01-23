@@ -79,6 +79,6 @@ class CreateLearningGoalForm(forms.ModelForm):
             'description': forms.Textarea(attrs={
                 'rows': 6,
                 'class': 'form-control',
-                'placeholder': '目的や目標レベルなどの説明を入力することで、より最適な学習プランを作成できます。(例:株価予測がしたい。)'
+                'placeholder': '目的や目標レベルなどの説明を追加することで、より最適な学習プランを作成できます。(例:株価予測がしたい。)'
             })
         }

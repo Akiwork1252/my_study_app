@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import re
 from openai import OpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
@@ -23,8 +24,8 @@ def generate_learning_plan(title, current_level, description):
 学習経験: {current_level}
 補足: {description}
 <作成ルール>
-1,(最重要)各topicは学習時間が長くならないようにできるだけ細かく設定してください。
-2,学習プランは<例>のようにJSON形式で作成してください。
+1,(重要)各topicは学習時間が長くならないようにできるだけ細かく設定してください。
+2,(必須)学習プランは<例>のようにJSON形式で作成してください。また文字列は""で囲む等厳密なJSON形式に従うこと、出力はJSON形式のデータのみにしてください。
 <例>[
     {{'topic':'python基本文法(変数)'}},
     {{'topic':'python基本文法(データ型)'}},
@@ -32,22 +33,30 @@ def generate_learning_plan(title, current_level, description):
 3,ユーザー入力はテーマのみ入力必須としています。それ以外は未入力(空文字)でも無視してください。
 """
     response = client.chat.completions.create(
-        model='gpt-3.5-turbo',
+        model='gpt-4o-mini',
         messages=[
             {'role': 'system', 'content': 'あなたはユーザーに最適な学習プランを提案するAIアシスタントです。'},
             {'role': 'user', 'content': prompt}
         ],
-        max_tokens=400,
+        max_tokens=1000,
         temperature=0.7,
     )
     raw_content = response.choices[0].message.content.strip()
+    if not raw_content:  # 空のレスポンスを確認
+        print("AIから空のレスポンスが返されました。")
+        print(f"Raw API Response:\n{response}")
+        return []
+    print(f"Debug: Raw Response Content:\n{raw_content}")
+    # 不要なバッククォートを削除
+    raw_content = raw_content.replace('```json', '').replace('```', '').strip()
+    json_match = re.search(r'\[.*\]', raw_content, re.DOTALL)
+    if not json_match:
+        print('JSONデータが見つかりませんでした。')
+        return []
+    json_data = json_match.group()
 
     try:
-        parsed_data = json.loads(raw_content)
-        if '学習プラン' in parsed_data:
-            generated_plan = parsed_data['学習プラン']
-        else:
-            generated_plan = parsed_data
+        generated_plan = json.loads(json_data)
     except json.JSONDecodeError as e:
         print(f'JSONでコードエラー: {e}')
         print(f'AIの出力内容:\n{raw_content}')
@@ -215,13 +224,18 @@ if __name__ == '__main__':
     # user_answer = 'int'
     # score = scoding(question, user_answer)
     # print(score)
-    question = '''
-問題: Pythonでファイルを書き込む際に使用するメソッドはどれか？
-a): write()
-b): read()
-c): append()
-d): close()
-'''
-    answer = 'a'
-    result = choice_test_scoring(question=question, user_answer=answer)
-    print(result)
+    # question = '''
+# 問題: Pythonでファイルを書き込む際に使用するメソッドはどれか？
+# a): write()
+# b): read()
+# c): append()
+# d): close()
+# '''
+#     answer = 'a'
+#     result = choice_test_scoring(question=question, user_answer=answer)
+#     print(result)
+    title = 'python'
+    level = '未経験'
+    description = '株価予測ができるようになりたい'
+    response = generate_learning_plan(title, level, description)
+    print(response)

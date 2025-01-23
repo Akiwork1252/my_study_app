@@ -13,6 +13,7 @@
 <div class='container-fluid px-4 px-lg-5 my-div-style'>
     <div>
         <h1>{{ request.user.username }}  〜{{ learningplan_list.0.learning_goal.title }}の学習プラン〜</h1>
+        <a href="{% url 'ascension:learning_goal_by_category' category_id %}">⏪  {{ category_name }}カテゴリに戻る</a>
     </div>
     <div class='row gx-4 gx-lg-5 justify-content-center'>
         <div class="col-md-10 col-lg-8 col-xl-7">

@@ -6,9 +6,8 @@
 
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/clean-blog.css' %}">
+<link rel="stylesheet" href="{% static 'css/mystyle.css' %}">
 {% endblock head %}
-
-{% block body_class %}scrollable-page{% endblock body_class %}
 
 {% block contents %}
 <div class='container px-4 px-lg-5 my-div-style'>
@@ -20,10 +19,9 @@
             {% for interest_category in interestcategory_list %}
                 <div class='post-preview'>
                     <a href="{% url 'ascension:learning_goal_by_category' category_id=interest_category.id %}">
-                        <h2 class='post-title'>
-                            {{ interest_category.name }}
-                        </h2>
+                        <h2 class='post-title m-0'>{{ interest_category.name }}</h2>
                     </a>
+                    <a href="{% url 'ascension:category_unlink' interest_category.id %}" class='btn btn-danger btn-sm'>削除</a>
                     <hr class='my-4'>
                 </div>
             {% empty %}
