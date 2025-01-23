@@ -12,12 +12,13 @@
 {% block contents %}
 <div class='container-fluid px-4 px-lg-5 my-div-style'>
     <div>
-        <h1>{{ request.user.username }}〜{{ learningplan_list.0.learning_goal.title }}の学習プラン〜</h1>
+        <h1>{{ request.user.username }}  〜{{ learningplan_list.0.learning_goal.title }}の学習プラン〜</h1>
     </div>
     <div class='row gx-4 gx-lg-5 justify-content-center'>
         <div class="col-md-10 col-lg-8 col-xl-7">
             {% if  learning_plan_id %}
                 <div class="d-flex justify-content-end mb-4">
+                    <a class='btn btn-warning float-right me-3' href="{% url 'analytics:make_graph' learning_goal_id %}">履歴</a>
                     <a class='btn btn-primary float-right' href="{% url 'learning:lecture_chat' learning_plan_id %}">講義を受ける</a>
                 </div>
             {% else %}

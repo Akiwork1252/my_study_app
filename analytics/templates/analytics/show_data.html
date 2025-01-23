@@ -1,0 +1,18 @@
+{% extends "ascension/base.html" %}
+{% load static %}
+
+{% block title %}データ表示|ASCENSION{% endblock title %}
+
+{% block contents %}
+<div class='container-fluid px-4 px-lg-5 my-div-style'>
+    <div>
+        <h1>{{ request.user.username }}  〜{{ learning_goal.title }}の学習履歴〜</h1>
+    </div>
+    <div>
+        <img src="{{ graph_path }}" alt="Progress Graph">
+    </div>
+</div>
+{% endblock contents %}
+
+
+

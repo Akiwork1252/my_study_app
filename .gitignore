@@ -4,6 +4,7 @@
 *.pyc
 *.jpg
 *.ico
+*.png
 .env
 .vscode/
 __pycache__/
