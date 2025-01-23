@@ -8,4 +8,5 @@ urlpatterns = [
     path('ai_support/', include(('ai_support.urls', 'ai_support'), namespace='ai_support')),
     path('learning/', include(('learning.urls', 'learning'), namespace='learning')),
     path('learning_test/', include(('learning_test.urls', 'learning_test'), namespace='learning_test')),
+    path('analytics/', include(('analytics.urls', 'analytics'), namespace='analytics')),
 ]
