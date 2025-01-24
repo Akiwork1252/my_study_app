@@ -136,7 +136,7 @@ class LearningPlanListView(LoginRequiredMixin, generic.ListView):
         learning_goal_id = self.kwargs.get('learning_goal_id')
         return LearningPlan.objects.filter(user=self.request.user, 
                                            learning_goal_id=learning_goal_id
-                                           )
+                                           ).order_by('id')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -160,7 +160,7 @@ class CategoryUnlinkView(LoginRequiredMixin, View):
     # 確認画面表示
     def get(self, request, *args, **kwargs):
         category = get_object_or_404(InterestCategory, id=kwargs['category_id'])
-        return render(request, 'ascension/list_delete.html', {'category': category})
+        return render(request, 'ascension/category_delete.html', {'category': category})
 
     @method_decorator(csrf_protect)
     def post(self, request, *args, **kwargs):
@@ -179,8 +179,18 @@ class CategoryUnlinkView(LoginRequiredMixin, View):
 # 学習目標の削除
 class LearningGoalDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = LearningGoal
-    template_name = 'list_delete.html'
-    success_url = reverse_lazy('ascension/learning_plan_list')
+    template_name = 'ascension/learning_goal_delete.html'
+    pk_url_kwarg = 'learning_goal_id'
 
-
-
+    def get_success_url(self):
+        learning_goal = self.get_object()
+        category_id = learning_goal.category.id
+        return reverse('ascension:learning_goal_by_category', kwargs={'category_id': category_id})
+    
+    def get_context_data(self, **kwargs):
+        context =  super().get_context_data(**kwargs)
+        learning_goal = get_object_or_404(LearningGoal, id=self.kwargs.get('learning_goal_id'))
+        category = learning_goal.category
+        context['learning_goal_title'] = learning_goal.title
+        context['category_id'] = learning_goal.category.id
+        return context

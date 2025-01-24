@@ -24,6 +24,7 @@
                             {{ learning_goal.title }}
                         </h2>
                     </a>
+                    <a href="{% url 'ascension:learning_goal_delete' learning_goal.id %}" class='btn btn-danger btn-sm'>削除</a>
                     <hr class='my-4'>
                 </div>
             {% empty %}

@@ -1,0 +1,17 @@
+{% extends "ascension/base.html" %}
+{% load static %}
+
+{% block title %}学習目標削除|ASCENSION{% endblock title %}
+
+{% block contents %}
+<div class='container my-div-style'>
+    <div class='row text-center'>
+        <form method="POST">
+            {% csrf_token %}
+            <p>学習目標"<strong>{{ learning_goal_title }}</strong>{{ learning_goal_id }}"を削除すると、これまでの学習記録も削除されます。本当に削除しますか？</p>
+            <button class='btn btn-primary mt-5' type='submit'>削除</button>
+            <a class='btn btn-secondary mt-5' href="{% url 'ascension:learning_goal_by_category' category_id %}">キャンセル</a>
+        </form>
+    </div>
+</div>
+{% endblock contents %}
