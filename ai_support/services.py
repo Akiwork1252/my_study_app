@@ -71,29 +71,36 @@ def generate_lecture_content(topic, user_input):
         return f'"{topic}" に関する講義を始めます。何か質問があれば教えてください。'
     
     # print(f"Generating lecture content for topic: {topic}, user input: {user_input}")
-    llm = ChatOpenAI(temperature=0.7)
+    llm = ChatOpenAI(model='gpt-4o-mini', temperature=0.7)
     prompt_template = ChatPromptTemplate.from_template(
-        'あなたは教師であり、ユーザーはあなたの生徒です。以下のトピックに基づいてハンズオン形式で講義を行ってください。\n'
+        'あなたは優秀な教師です。以下のトピックに基づいて講義を行ってください。\n'
+        '出力は以下の<ルール>に基づいて行なってください。'
         'トピック:{topic}\n'
         'ユーザーの応答:{user_input}\n'
-        '次の講義内容を出力してください。\n'
+        '<ルール>\n'
+        '1,講義前に要点を列挙して、最後に改行を入れること。(例)<今回の講義内容>1.要点、2.要点、\n'
+        '2,１つの要点を説明したら、改行を入れる。'
+        '3,例としてプログラミングコードなどを入れる場合は、改行を入れてから、例:~と出力する。'
         # '{topic}に関する講義内容が全て終了した場合は、以下の終了コメントを出力してください。\n'
         # '終了コメント:講義は以上です。質問があれば入力してください。「終了」ボタンで講義を終了します。'
     )
 
     prompt = prompt_template.format_prompt(topic=topic, user_input=user_input)
+    print(f'prompt: {prompt}')
     # print(f"Generated prompt: {prompt.to_string()}")
     response = llm.invoke(prompt.to_string())
+    print(f'response: {response}')
     # print(f"Response received: {response.content}")
     if not response.content.strip():
         return 'トピックに基づくテスト問題生成中に問題が発生しました。'
+    print(f'return: {response.content}')
     return response.content
 
 
 # テスト採点(選択問題用)
 def choice_test_scoring(question, user_answer):
     print(f'Debug:Question: {question}, User Answer: {user_answer}')
-    llm = ChatOpenAI(temperature=0.2)
+    llm = ChatOpenAI(model='gpt-4o-mini', temperature=0.2)
     prompt_template = ChatPromptTemplate.from_template(
         '以下はテスト問題とユーザーの回答です。\n'
         'テスト問題:{question}\n'
@@ -131,7 +138,7 @@ def choice_test_scoring(question, user_answer):
 # テスト採点(記述問題用)
 def written_test_scoring(question, user_answer):
     print(f'Debug:Question: {question}, User Answer: {user_answer}')
-    llm = ChatOpenAI(temperature=0.2)
+    llm = ChatOpenAI(model='gpt-4o-mini', temperature=0.2)
     prompt_template = ChatPromptTemplate.from_template(
         '以下はテスト問題とユーザーの回答です。\n'
         'テスト問題:{question}\n'
@@ -169,7 +176,7 @@ def written_test_scoring(question, user_answer):
 
 # 選択問題を生成
 def generate_multiple_choice_questions(topic, previous_question=''):
-    llm = ChatOpenAI(temperature=0.7)
+    llm = ChatOpenAI(model='gpt-4o-mini', temperature=0.7)
     if previous_question:
         prompt_text = (
             'あなたは教師です。以下のトピックから1問の選択問題を生成してください。\n'
@@ -199,7 +206,7 @@ def generate_multiple_choice_questions(topic, previous_question=''):
 
 # 入力問題を生成
 def generate_written_questions(topic):
-    llm = ChatOpenAI(temperature=0.7)
+    llm = ChatOpenAI(model='gpt-4o-mini', temperature=0.7)
     prompt_text = (
         'あなたは教師です。以下のトピックから1問のコーディング問題を生成してください。'
         'トピック内容がプログラミングでなければ、記述式の問題を生成してください。'

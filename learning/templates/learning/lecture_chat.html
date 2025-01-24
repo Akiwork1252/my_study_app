@@ -10,7 +10,7 @@
         <div id='chat-box' class='border p-3 mb-3' style='height: 400px; overflow-y: auto;'>
             <div class='text-start mb-2'>
                 <strong>AI:</strong>
-                {{ initial_ai_message }}
+                {{ initial_ai_message|safe }}
             </div>
         </div class="d-flex justify-content-end">
         <form id='chat-form' action="">
@@ -51,17 +51,19 @@
         })
         .then(response => response.json())
         .then(data => {
-            // AIの応答を表示
+            const lines = data.lecture_response.split('\n'); // 改行で分割
             const aiDiv = document.createElement('div');
-            aiDiv.textContent = `AI: ${data.lecture_response}`;
             aiDiv.classList.add('text-start', 'mb-2');
+            lines.forEach(line => {
+                const lineDiv = document.createElement('div');
+                lineDiv.textContent = line; // 各行を安全にテキストとして追加
+                aiDiv.appendChild(lineDiv);
+            });
             chatBox.appendChild(aiDiv);
-
+        
             // チャットボックスをスクロール
             chatBox.scrollTop = chatBox.scrollHeight;
-
-            // 入力欄をクリア
-            messageInput.value = '';
+            messageInput.value = ''; // 入力欄をクリア
         });
     });
 
