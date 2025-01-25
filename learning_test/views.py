@@ -140,11 +140,12 @@ def written_test_view(request, learning_goal_id):
         # 問題文をセッションに保存
         request.session['current_question'] = question
 
-        return render(request, 'learning_test/test_chat.html', {
+        return render(request, 'learning_test/written_test_chat.html', {
             'learning_goal_id': learning_goal_id,
             'question': question
         })
     
+
     elif request.method == 'POST':
         user_answer = request.POST.get('message')
         # セッションからtopicとlearning_plan_idを取り出す
@@ -182,6 +183,7 @@ def written_test_view(request, learning_goal_id):
             score=score,
             started_at=timezone.now()
         )
+        
         # LearningGoalモデルのtotalスコアを更新
         learning_goal = LearningGoal.objects.get(id=learning_goal_id)
         learning_goal.total_score = (learning_goal.total_score or 0) + score
@@ -189,8 +191,8 @@ def written_test_view(request, learning_goal_id):
 
         return JsonResponse({
             'score': score,
-            'message': explanation,
-            'redirect_url': reverse('ascension:learning_plan_list', args=[learning_goal_id]),
+            'explanation': explanation,
+            'message': '記述テストは以上です。終了ボタンを押してください。',
         })
         
 

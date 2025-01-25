@@ -1,7 +1,7 @@
 {% extends "ascension/base.html" %}
 {% load static %}
 
-{% block title %}学びで人生のステージを上げる|ASCENSION{% endblock title %}
+{% block title %}TOP|ASCENSION{% endblock title %}
 
 {% block header %}
 <!-- Masthead-->
@@ -17,6 +17,7 @@
                     あなた専用の学習サービス
                 </p>
                 {% if user.is_authenticated %}
+                <a class="btn btn-primary btn-xl" href="{% url 'ascension:interest_list' %}">カテゴリ画面</a>
                 {% else %}
                 <a class="btn btn-primary btn-xl" href="{% url 'account_login' %}">
                     Log In
