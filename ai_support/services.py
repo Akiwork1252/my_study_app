@@ -105,7 +105,7 @@ def choice_test_scoring(question, user_answer):
         '以下はテスト問題とユーザーの回答です。\n'
         'テスト問題:{question}\n'
         'ユーザーの回答:{user_answer}\n'
-        '10点満点で採点し、スコアと解説を以下の例のように辞書型(重要)で出力してください。\n'
+        '10点満点で採点し、スコアと解説を以下の例のように辞書型(必須)で出力してください。\n'
         '例:{{"score": スコア, "explanation": 解説}}'
     )
 
@@ -140,12 +140,14 @@ def written_test_scoring(question, user_answer):
     print(f'Debug:Question: {question}, User Answer: {user_answer}')
     llm = ChatOpenAI(model='gpt-4o-mini', temperature=0.2)
     prompt_template = ChatPromptTemplate.from_template(
-        '以下はテスト問題とユーザーの回答です。\n'
+        'あなたは優秀な教師です。以下はテスト問題とユーザーの回答です。\n'
         'テスト問題:{question}\n'
         'ユーザーの回答:{user_answer}\n'
-        '以下の採点基準を元に採点を行い、スコア(合計点数)と解説を出力例のように辞書型(重要)で出力してください。\n'
-        '採点基準:正確性(/40点)、設計(/20点)、読みやすさ(/20点)、ベストプラクティス(/20点)'
+        '100点満点で採点を行なった後に解説を生成して出力例のように辞書型(重要)で出力ください。'
         '出力例:{{"score": 合計点数, "explanation": 解説}}'
+        'テスト問題がプログラミングの場合は以下のような(採点基準の例)を元に採点を行い、解説で説明を行なってください。\n'
+        '採点基準の例:正確性(/40点)、設計(/20点)、読みやすさ(/20点)、ベストプラクティス(/20点)'
+       
     )
 
     print(f"Debug: Prompt Template: {prompt_template}")
@@ -180,9 +182,10 @@ def generate_multiple_choice_questions(topic, previous_question=''):
     if previous_question:
         prompt_text = (
             'あなたは教師です。以下のトピックから1問の選択問題を生成してください。\n'
-            '前回の問題と内容が重複しないように注意してください。\n'
+            '前回の問題と問題内容が重複しないように注意してください。\n'
             'トピック:{topic}\n'
             '前回の問題:{previous_question}\n'
+            '以下の<例>のように**改行を必ず適用**して出力してください。\n'
             '<例>\n'
             '問題: 生成した問題\n'
             'a): 選択肢1\n'
@@ -191,10 +194,10 @@ def generate_multiple_choice_questions(topic, previous_question=''):
         prompt_text = (
             'あなたは教師です。以下のトピックから1問の選択問題を生成してください。\n'
             'トピック:{topic}\n'
-             '以下の<例>のように**改行を必ず適用**して出力してください。\n'
-             '<例>\n'
-             '問題: 生成した問題\n'
-             'a): 選択肢1\n'
+            '以下の<例>のように**改行を必ず適用**して出力してください。\n'
+            '<例>\n'
+            '問題: 生成した問題\n'
+            'a): 選択肢1\n'
         )
 
     prompt_template = ChatPromptTemplate.from_template(prompt_text)
@@ -208,8 +211,8 @@ def generate_multiple_choice_questions(topic, previous_question=''):
 def generate_written_questions(topic):
     llm = ChatOpenAI(model='gpt-4o-mini', temperature=0.7)
     prompt_text = (
-        'あなたは教師です。以下のトピックから1問のコーディング問題を生成してください。'
-        'トピック内容がプログラミングでなければ、記述式の問題を生成してください。'
+        'あなたは教師です。以下のトピックから1問の記述問題を生成してください。'
+        'トピックがプログラミングであれば、コーディング問題を生成してください。'
         'トピック:{topic}\n'
         '<例>\n'
         '問題: 生成した問題\n'

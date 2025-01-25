@@ -21,6 +21,7 @@
             <input type="text" id='message-input' class='form-control mb-2' placeholder='回答を入力' required>
             <div>
                 <button type='submit' class='btn btn-primary float-right'>回答</button>
+                <a href="{% url 'ascension:learning_plan_list' learning_goal_id %}" class='btn btn-primary float-right'>終了</a>
             </div>
         </form>
     </div>
@@ -41,6 +42,10 @@
         }
         return cookieValue;
     }
+    function n12br(str) {
+        return str.replace(/\n/g, '<br>');
+    }
+
     const csrfToken = getCookie('csrftoken');
     const learningTestURL = "{% url 'learning_test:choice_test' learning_goal_id %}";
 
@@ -50,6 +55,8 @@
     const chatForm = document.getElementById('chat-form');
     const chatBox = document.getElementById('chat-box');
     const messageInput = document.getElementById('message-input');
+    const endLectureButton = document.getElementById('end-lecture');
+    const learningGoalID = {{ learning_goal_id }};
 
     chatForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -67,15 +74,17 @@
         })
         .then(response => response.json())
         .then(data => {
-            if (data.redirect_url) {
-                chatBox.innerHTML += `<div><strong>AI:</strong> 総合スコア: ${data.score}</div>`;
-                window.location.href = data.redirect_url;
+            if (questionCount == 5) {
+                chatBox.innerHTML += `<div><strong>スコア:</strong> ${data.score}</div>`;
+                chatBox.innerHTML += `<div><strong>解説:</strong> ${data.explanation}</div>`;
+                chatBox.innerHTML += `<div><strong>AI:</strong> 総合スコア: ${data.total_score}</div>`;
+                chatBox.innerHTML += `<div><strong>AI:</strong> ${data.message}</div>`;
             } else if (data.next_question) {
                 // スコアと解説
                 chatBox.innerHTML += `<div><strong>スコア:</strong> ${data.score}</div>`;
                 chatBox.innerHTML += `<div><strong>解説:</strong> ${data.explanation}</div>`;
                 // 次の問題を表示
-                chatBox.innerHTML += `<div><strong>AI:</strong> ${data.next_question}</div>`;
+                chatBox.innerHTML += `<div><strong>AI:</strong> ${n12br(data.next_question)}</div>`;
                 questionCount += 1;
                 totalScore = data.total_score;
             } else if (data.error) {
@@ -84,5 +93,6 @@
             messageInput.value = '';
         });
     });
+
 </script>
 {% endblock contents %}
