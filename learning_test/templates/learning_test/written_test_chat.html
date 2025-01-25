@@ -1,7 +1,7 @@
 {% extends "ascension/base.html" %}
 {% load static %}
 
-{% block title %}選択問題|ASCENSION{% endblock title %}
+{% block title %}記述問題|ASCENSION{% endblock title %}
 {% block active_lecture %}active{% endblock active_lecture %}
 
 {% block contents %}
@@ -12,13 +12,13 @@
                 <strong>AI:</strong>
                 {{ question|linebreaks }}
             </div>
-            <form method="POST" action="{% url 'learning_test:choice_test' learning_goal_id %}">
+            <form method="POST" action="{% url 'learning_test:written_test' learning_goal_id %}">
                 {% csrf_token %}
             </form>
         </div class="d-flex justify-content-end">
         <form id='chat-form' action="">
             {% csrf_token %}
-            <input type="text" id='message-input' class='form-control mb-2' placeholder='回答を入力' required>
+            <textarea id="message-input" class='form-control mb-2' placeholder='ここに回答を入力してください。' rows='8' style='resize: vertical; width: 100%;' required></textarea>
             <div>
                 <button type='submit' class='btn btn-primary float-right'>回答</button>
                 <a href="{% url 'ascension:learning_plan_list' learning_goal_id %}" class='btn btn-primary float-right'>終了</a>
@@ -47,7 +47,7 @@
     }
 
     const csrfToken = getCookie('csrftoken');
-    const learningTestURL = "{% url 'learning_test:choice_test' learning_goal_id %}";
+    const learningTestURL = "{% url 'learning_test:written_test' learning_goal_id %}";
 
     let questionCount = 1;
     let totalScore = 0;
@@ -63,7 +63,7 @@
         const userMessage = messageInput.value;
 
         // ユーザーメッセージ
-        chatBox.innerHTML += `<div><strong>あなた:</strong> ${userMessage}</div>`;
+        chatBox.innerHTML += `<div><strong>あなた:</strong> ${n12br(userMessage)}</div>`;
         fetch(`${learningTestURL}?question_count=${questionCount}&total_score=${totalScore}`, {
             method: "POST",
             headers: {
@@ -74,19 +74,10 @@
         })
         .then(response => response.json())
         .then(data => {
-            if (questionCount == 5) {
+            if (data.score) {
                 chatBox.innerHTML += `<div><strong>スコア:</strong> ${data.score}</div>`;
-                chatBox.innerHTML += `<div><strong>解説:</strong> ${data.explanation}</div>`;
-                chatBox.innerHTML += `<div><strong>AI:</strong> 総合スコア: ${data.total_score}</div>`;
+                chatBox.innerHTML += `<div><strong>解説:</strong> ${n12br(data.explanation)}</div>`;
                 chatBox.innerHTML += `<div><strong>AI:</strong> ${data.message}</div>`;
-            } else if (data.next_question) {
-                // スコアと解説
-                chatBox.innerHTML += `<div><strong>スコア:</strong> ${data.score}</div>`;
-                chatBox.innerHTML += `<div><strong>解説:</strong> ${data.explanation}</div>`;
-                // 次の問題を表示
-                chatBox.innerHTML += `<div><strong>AI:</strong> ${n12br(data.next_question)}</div>`;
-                questionCount += 1;
-                totalScore = data.total_score;
             } else if (data.error) {
                 console.error(data.error);
             }
