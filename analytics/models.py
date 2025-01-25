@@ -23,9 +23,6 @@ class Progress(models.Model):
     completed_at = models.DateTimeField(blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        unique_together = ('user', 'learning_plan')
-
     def save(self, *args, **kwargs):
         if self.status == 'in_progress' and not self.started_at:
             self.started_at = timezone.now()
