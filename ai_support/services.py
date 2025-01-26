@@ -135,7 +135,7 @@ def choice_test_scoring(question, user_answer):
     return result
 
 
-# テスト採点(記述問題用)
+# テスト採点(記述問題用, 総合問題)
 def written_test_scoring(question, user_answer):
     print(f'Debug:Question: {question}, User Answer: {user_answer}')
     llm = ChatOpenAI(model='gpt-4o-mini', temperature=0.2)
@@ -222,6 +222,23 @@ def generate_written_questions(topic):
     response = llm.invoke(prompt.to_string())
     return response.content
 
+# 総合問題を生成
+def generate_comprehesive_questions(topics):
+    llm = ChatOpenAI(model='gpt-4o-mini', temperature=0.7)
+    topics_str = ', '.join(topics)
+    print(f'DEBUG: topics_str={topics_str}')
+    prompt_text = (
+        'あなたは教師です。ユーザーは以下のトピック一覧の学習を行いました。\n'
+        'これらの内容が混在した総合記述問題を１問生成してください。'
+        'トピックがプログラミングであれば、コーディング問題を生成してください。'
+        'トピック一覧:{topics}\n'
+        '<例>\n'
+        '問題: 生成した問題\n'
+    )
+    prompt_template = ChatPromptTemplate.from_template(prompt_text)
+    prompt = prompt_template.format_prompt(topics=topics_str)
+    response = llm.invoke(prompt.to_string())
+    return response.content
 
 if __name__ == '__main__':
     # print(generate_learning_plan('Jave', '未経験', ''))

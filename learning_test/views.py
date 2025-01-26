@@ -5,7 +5,7 @@ from django.views import View, generic
 from django.utils import timezone
 from django.urls import reverse
 
-from ai_support.services import choice_test_scoring, generate_multiple_choice_questions, written_test_scoring, generate_written_questions
+from ai_support.services import choice_test_scoring, generate_multiple_choice_questions, written_test_scoring, generate_written_questions, generate_comprehesive_questions
 from ascension.models import LearningPlan, LearningGoal
 from analytics.models import Progress
 
@@ -183,7 +183,7 @@ def written_test_view(request, learning_goal_id):
             score=score,
             started_at=timezone.now()
         )
-        
+
         # LearningGoalモデルのtotalスコアを更新
         learning_goal = LearningGoal.objects.get(id=learning_goal_id)
         learning_goal.total_score = (learning_goal.total_score or 0) + score
@@ -196,6 +196,67 @@ def written_test_view(request, learning_goal_id):
         })
         
 
-if __name__ == '__main__':
-    pass
+# テストチャット(学習目標総合問題)
+def comprehensive_test_view(request, learning_goal_id):
+    if request.method == 'GET':
+        # 学習目標の全てのlearning planを取得
+        learning_plans = LearningPlan.objects.filter(user=request.user, learning_goal_id=learning_goal_id)
+        if not learning_plans.exists():
+            return JsonResponse({'ERROR': '関連するLearningPlanが取得できませんでした。'})
+        
+        # 全てのトピックをリスト化してセッションに保存
+        topics = [plan.topic for plan in learning_plans]
+        print(f'DEBUG: topics={topics}')
+        request.session['topics'] = topics
+
+        # topicに関する総合問題文を生成してセッションに保存
+        question = generate_comprehesive_questions(topics)
+        request.session['current_question'] = question
+
+        return render(request, 'learning_test/comprehensive_test_chat.html', {
+            'learning_goal_id': learning_goal_id,
+            'question': question
+        })
+    
+
+    elif request.method == 'POST':
+        user_answer = request.POST.get('message')
+
+        # セッションからtopic一覧と問題を取り出す
+        topics = request.session.get('topics', [])  
+        previous_question = request.session.get('current_question', '')
+        print(f"Debug: topic={topics}, previous_question={previous_question}")
+
+        if not topics or not learning_plan_id:
+            return JsonResponse({'ERROR': 'セッションから必要なデータが見つかりません。'})
+
+        if not previous_question:
+            return JsonResponse({'ERROR': '問題が見つかりません。'})
+
+
+        # 採点結果を取得
+        result = written_test_scoring(previous_question, user_answer)  # 戻り値:{'score': int float, 'explanation': str}
+        print(f"Debug: result={result}")
+        score = result['score']
+        explanation = result['explanation']
+
+        print("Debug: テスト終了処理開始")
+        # Progressモデルにテストデータ保存
+        progress = Progress.objects.create(
+            user=request.user,
+            learning_goal_id=learning_goal_id,
+            score=score,
+            started_at=timezone.now()
+        )
+
+        # LearningGoalモデルのtotalスコアを更新
+        learning_goal = LearningGoal.objects.get(id=learning_goal_id)
+        learning_goal.total_score = (learning_goal.total_score or 0) + score
+        learning_goal.save()
+
+        return JsonResponse({
+            'score': score,
+            'explanation': explanation,
+            'message': '記述テストは以上です。終了ボタンを押してください。',
+        })
 
