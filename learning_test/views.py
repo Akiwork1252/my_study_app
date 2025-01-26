@@ -10,6 +10,24 @@ from ascension.models import LearningPlan, LearningGoal
 from analytics.models import Progress
 
 
+# 記述問題のスコア調整(DB保存用score) (例: 92点>>> 52pt(92-40)、  38点>>> -2pt(40-38)
+def _written_test_score_adjustments(score, border=40):
+    if score >= border:
+        score -= border  
+    else:
+        score = -(border-score)
+    return score
+
+
+# 選択問題のスコア調整(DB保存用score)
+def _choice_test_score_abjustments(score, border=20):
+    if score >= border:
+        score -= border
+    else:
+        score = -(border-score)
+    return score
+
+
 # テストチャット(選択問題)
 def choice_test_view(request, learning_goal_id):
     if request.method == 'GET':
@@ -83,17 +101,19 @@ def choice_test_view(request, learning_goal_id):
         # テスト終了条件
         if question_count >= 5:
             print("Debug: テスト終了処理開始")
+            # 保存用のスコア
+            saved_score = _choice_test_score_abjustments(total_score)
             # Progressモデルにテストデータ保存
             progress = Progress.objects.create(
                 user=request.user,
                 learning_goal_id=learning_goal_id,
                 learning_plan_id = learning_plan_id,
-                score=total_score,
+                score=saved_score,
                 started_at=timezone.now()
             )
             # LearningGoalモデルのtotalスコアを更新
             learning_goal = LearningGoal.objects.get(id=learning_goal_id)
-            learning_goal.total_score = (learning_goal.total_score or 0) + total_score
+            learning_goal.total_score = (learning_goal.total_score or 0) + saved_score
             learning_goal.save()
 
             return JsonResponse({
@@ -175,18 +195,20 @@ def written_test_view(request, learning_goal_id):
         learning_plan_id = request.session.get('learning_plan_id')
         if learning_plan_id is None:
             return JsonResponse({'ERROR': 'セッションにlearning_plan_idがありません。'})
+        # 保存用のスコア
+        saved_score = _written_test_score_adjustments(score)
         # Progressモデルにテストデータ保存
         progress = Progress.objects.create(
             user=request.user,
             learning_goal_id=learning_goal_id,
             learning_plan_id = learning_plan_id,
-            score=score,
+            score=saved_score,
             started_at=timezone.now()
         )
 
         # LearningGoalモデルのtotalスコアを更新
         learning_goal = LearningGoal.objects.get(id=learning_goal_id)
-        learning_goal.total_score = (learning_goal.total_score or 0) + score
+        learning_goal.total_score = (learning_goal.total_score or 0) + saved_score
         learning_goal.save()
 
         return JsonResponse({
@@ -241,18 +263,20 @@ def comprehensive_test_view(request, learning_goal_id):
         explanation = result['explanation']
 
         print("Debug: テスト終了処理開始")
+        # 保存用のスコア
+        saved_score = _written_test_score_adjustments(score)
         # Progressモデルにテストデータ保存
         progress = Progress.objects.create(
             user=request.user,
             learning_goal_id=learning_goal_id,
             learning_plan=None,
-            score=score,
+            score=saved_score,
             started_at=timezone.now()
         )
 
         # LearningGoalモデルのtotalスコアを更新
         learning_goal = LearningGoal.objects.get(id=learning_goal_id)
-        learning_goal.total_score = (learning_goal.total_score or 0) + score
+        learning_goal.total_score = (learning_goal.total_score or 0) + saved_score
         learning_goal.save()
 
         return JsonResponse({
@@ -261,3 +285,7 @@ def comprehensive_test_view(request, learning_goal_id):
             'message': '記述テストは以上です。終了ボタンを押してください。',
         })
 
+if __name__ == '__main__':
+    n = 10
+    score = _choice_test_score_abjustments(n)
+    print(score)
