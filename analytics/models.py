@@ -9,7 +9,7 @@ from ascension.models import LearningPlan, LearningGoal
 class Progress(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     learning_goal = models.ForeignKey(LearningGoal, on_delete=models.CASCADE, null=True, blank=True)
-    learning_plan = models.ForeignKey(LearningPlan, on_delete=models.CASCADE)
+    learning_plan = models.ForeignKey(LearningPlan, on_delete=models.SET_NULL, null=True, blank=True)
     status = models.CharField(max_length=20,
                               choices=[
                                   ('not_started', '未完了'),

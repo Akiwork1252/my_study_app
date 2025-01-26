@@ -210,7 +210,10 @@ def comprehensive_test_view(request, learning_goal_id):
         request.session['topics'] = topics
 
         # topicに関する総合問題文を生成してセッションに保存
-        question = generate_comprehesive_questions(topics)
+        try:
+            question = generate_comprehesive_questions(topics)
+        except Exception as e:
+            return JsonResponse({'ERROR': f'問題の生成に失敗しました。: {str(e)}'})
         request.session['current_question'] = question
 
         return render(request, 'learning_test/comprehensive_test_chat.html', {
@@ -227,11 +230,8 @@ def comprehensive_test_view(request, learning_goal_id):
         previous_question = request.session.get('current_question', '')
         print(f"Debug: topic={topics}, previous_question={previous_question}")
 
-        if not topics or not learning_plan_id:
+        if not topics or not previous_question:
             return JsonResponse({'ERROR': 'セッションから必要なデータが見つかりません。'})
-
-        if not previous_question:
-            return JsonResponse({'ERROR': '問題が見つかりません。'})
 
 
         # 採点結果を取得
@@ -245,6 +245,7 @@ def comprehensive_test_view(request, learning_goal_id):
         progress = Progress.objects.create(
             user=request.user,
             learning_goal_id=learning_goal_id,
+            learning_plan=None,
             score=score,
             started_at=timezone.now()
         )
