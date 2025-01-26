@@ -143,37 +143,40 @@ def written_test_scoring(question, user_answer):
         'あなたは優秀な教師です。以下はテスト問題とユーザーの回答です。\n'
         'テスト問題:{question}\n'
         'ユーザーの回答:{user_answer}\n'
-        '100点満点で採点を行なった後に解説を生成して出力例のように辞書型(重要)で出力ください。'
-        '出力例:{{"score": 合計点数, "explanation": 解説}}'
-        'テスト問題がプログラミングの場合は以下のような(採点基準の例)を元に採点を行い、解説で説明を行なってください。\n'
-        '採点基準の例:正確性(/40点)、設計(/20点)、読みやすさ(/20点)、ベストプラクティス(/20点)'
+        'あなたの役割はこの回答を評価し、100点満点で採点を行なった後に解説を提供する事です。\n'
+        '必ず次のフォーマットでJSON形式の辞書を出力してください。JSON形式以外の出力は不適切とみなされます。\n'
+        '例:{{"score": 合計点数, "explanation": 解説}}'
+        'テスト問題がプログラミングの場合は以下のような採点基準例を元に採点を行い、解説内(重要)で説明を行なってください。\n'
+        '採点基準例:正確性(/40点)、設計(/20点)、読みやすさ(/20点)、ベストプラクティス(/20点)'
        
     )
 
     print(f"Debug: Prompt Template: {prompt_template}")
     try:
-        prompt = prompt_template.format_prompt(
-            question=question, 
-            user_answer=user_answer
-        )
-        print(f'Debug: prompt: {prompt}')
+        for attempt in range(3):
+            prompt = prompt_template.format_prompt(
+                question=question, 
+                user_answer=user_answer
+            )
+            print(f'Debug: prompt: {prompt}')
+            response = llm.invoke(prompt.to_string())
+            print(f'AI Response: {response.content}')
 
-        response = llm.invoke(prompt.to_string())
-        print(f'AI Response: {response.content}')
+            try:
+                result = json.loads(response.content)
+                if isinstance(result, dict) and ('score' in result) and ('explanation' in result):
+                    return result
+                
+            except json.JSONDecodeError:
+                print('JSON Decode Error: 再試行を行います。')
 
-        result = json.loads(response.content)
-        if not isinstance(result, dict):
-            raise ValueError(f'AI response is not a directory: {result}')
-        missing_keys = [key for key in ['score', 'explanation'] if key not in result]
-        if missing_keys:
-            raise KeyError(f'Missing Keys in AI response: {missing_keys}, Response: {result}')
-    except json.JSONDecodeError as e:
-        print(f'JSON Decode Error: {response.content}')
-        raise e
+        result = {"score": 0, "explanation": "AIの応答が不正確なため、スコアリングと解説を生成できませんでした。"}
+        return result
+    
     except Exception as e:
         print(f'Unexpected Error: {e}')
-        raise e
-    return result
+        result = {"score": 0, "explanation": "AIの応答が不正確なため、スコアリングと解説を生成できませんでした。"}
+        return result
 
 
 # 選択問題を生成
