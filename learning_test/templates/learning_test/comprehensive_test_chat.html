@@ -1,0 +1,89 @@
+{% extends "ascension/base.html" %}
+{% load static %}
+
+{% block title %}総合問題|ASCENSION{% endblock title %}
+{% block active_lecture %}active{% endblock active_lecture %}
+
+{% block contents %}
+<div class='container d-flex justify-content-center'>
+    <div class='my-div-style col-12 col-md-7'>
+        <div id='chat-box' class='border p-3 mb-3' style='height: 400px; overflow-y: auto;'>
+            <div class='text-start mb-2'>
+                <strong>AI:</strong>
+                {{ question|linebreaks }}
+            </div>
+            <form method="POST" action="{% url 'learning_test:comprehensive_test' learning_goal_id %}">
+                {% csrf_token %}
+            </form>
+        </div class="d-flex justify-content-end">
+        <form id='chat-form' action="">
+            {% csrf_token %}
+            <textarea id="message-input" class='form-control mb-2' placeholder='ここに回答を入力してください。' rows='8' style='resize: vertical; width: 100%;' required></textarea>
+            <div>
+                <button type='submit' class='btn btn-primary float-right'>回答</button>
+                <a href="{% url 'ascension:learning_plan_list' learning_goal_id %}" class='btn btn-primary float-right'>終了</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    function n12br(str) {
+        return str.replace(/\n/g, '<br>');
+    }
+
+    const csrfToken = getCookie('csrftoken');
+    const learningTestURL = "{% url 'learning_test:comprehensive_test' learning_goal_id %}";
+
+    let questionCount = 1;
+    let totalScore = 0;
+
+    const chatForm = document.getElementById('chat-form');
+    const chatBox = document.getElementById('chat-box');
+    const messageInput = document.getElementById('message-input');
+    const endLectureButton = document.getElementById('end-lecture');
+    const learningGoalID = {{ learning_goal_id }};
+
+    chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const userMessage = messageInput.value;
+
+        // ユーザーメッセージ
+        chatBox.innerHTML += `<div><strong>あなた:</strong> ${n12br(userMessage)}</div>`;
+        fetch(`${learningTestURL}?question_count=${questionCount}&total_score=${totalScore}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": csrfToken
+            },
+            body: new URLSearchParams({ message: userMessage })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.score) {
+                chatBox.innerHTML += `<div><strong>スコア:</strong> ${data.score}</div>`;
+                chatBox.innerHTML += `<div><strong>解説:</strong> ${n12br(data.explanation)}</div>`;
+                chatBox.innerHTML += `<div><strong>AI:</strong> ${data.message}</div>`;
+            } else if (data.error) {
+                console.error(data.error);
+            }
+            messageInput.value = '';
+        });
+    });
+
+</script>
+{% endblock contents %}
