@@ -19,7 +19,7 @@
         <div class="col-md-10 col-lg-8 col-xl-7">
             {% if  learning_plan_id %}
                 <div class="d-flex justify-content-end mb-4">
-                    <a class='btn btn-warning float-right me-3' href="{% url 'analytics:make_graph' learning_goal_id %}">履歴</a>
+                    <a class='btn btn-warning float-right me-3' href="{% url 'analytics:data_top_menu' learning_goal_id %}">学習データ</a>
                     <a class='btn btn-primary float-right me-3' href="{% url 'learning_test:comprehensive_test' learning_goal_id %}">総合問題</a>
                     <a class='btn btn-primary float-right' href="{% url 'learning:lecture_chat' learning_plan_id %}">講義を受ける</a>
                 </div>

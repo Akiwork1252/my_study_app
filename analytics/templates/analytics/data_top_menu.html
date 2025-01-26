@@ -1,0 +1,28 @@
+{% extends "ascension/base.html" %}
+{% load static %}
+
+{% block title %}学習データTOP|ASCENSION{% endblock title %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/clean-blog.css' %}">
+<link rel="stylesheet" href="{% static 'css/mystyle.css' %}">
+{% endblock head %}
+
+
+{% block contents %}
+<div class='container-fluid px-4 px-lg-5 my-div-style'>
+    <div>
+        <h1>{{ request.user.username }}  〜<strong>{{ learning_goal.title }}</strong>の学習データ</h1>
+        <a href="{% url 'ascension:learning_plan_list' learning_goal.id %}">⏪  学習目標"{{ learning_goal.title }}"に戻る</a>
+    </div>
+    <br>
+    <div class='row gx-4 gx-lg-5 justify-content-center'>
+        <h3>Menu</h3>
+        <a href="{% url 'analytics:show_total_score_graph' learning_goal.id %}"><strong>"{{ learning_goal.title}}"</strong>のトータルスコア</a>
+        <a href="{% url 'analytics:show_topic_test_score_graph' learning_goal.id %}">総合テストのスコア推移</a>
+        <a href="">トピックテストのスコア推移</a>
+        <a href="">講義のノート</a>
+        <a href="">テストのノート</a>
+    </div>
+</div>
+{% endblock contents %}

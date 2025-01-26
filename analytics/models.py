@@ -31,4 +31,8 @@ class Progress(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.learning_plan.topic} - {self.get_status_display()}'
+        if self.learning_plan:
+            learning_plan_topic = self.learning_plan.topic 
+        else:
+            learning_plan_topic = self.learning_goal.title
+        return f'{learning_plan_topic} - {self.get_status_display()}'
