@@ -11,6 +11,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 from django.views import View, generic
 from .models import Progress, LearningGoal
+from my_study_app import settings_dev
+
 
 # データトップ画面
 class DataTopView(View):
@@ -53,7 +55,7 @@ def show_total_score_graph(request, learning_goal_id):
         plt.tight_layout()
 
         # 保存
-        output_dir = 'static/graph/'
+        output_dir = os.path.join(settings_dev.MEDIA_ROOT, 'graph/')
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
@@ -102,7 +104,7 @@ def show_topic_score_graph(request, learning_goal_id):
         plt.tight_layout()
 
         # 保存
-        output_dir = 'static/graph/'
+        output_dir = os.path.join(settings_dev.MEDIA_ROOT, 'graph/')
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 

@@ -79,20 +79,40 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'my_study_app.wsgi.application'
 
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-# Database
+
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': config('DB_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': config('DB_NAME', default='ascension'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
+# 本番環境
+if os.environ.get('DJANGO_ENV') == 'production':
+    # Database
+    DATABASES = {
+        'default': {
+            'ENGINE': os.environ.get('DB_ENGINE', default='django.db.backends.postgresql'),
+            'NAME': os.environ.get('DB_NAME', default='ascension'),
+            'USER': os.environ.get('DB_USER'),
+            'PASSWORD': os.environ.get('DB_PASSWORD'),
+            'HOST': os.environ.get('DB_HOST', default='localhost'),
+            'PORT': os.environ.get('DB_PORT', default='5432'),
+        }
     }
-}
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+# 開発環境
+else:
+    # Database
+    DATABASES = {
+        'default': {
+            'ENGINE': config('DB_ENGINE', default='django.db.backends.postgresql'),
+            'NAME': config('DB_NAME', default='ascension'),
+            'USER': config('DB_USER'),
+            'PASSWORD': config('DB_PASSWORD'),
+            'HOST': config('DB_HOST', default='localhost'),
+            'PORT': config('DB_PORT', default='5432'),
+        }
+    }
+    SECRET_KEY = config('SECRET_KEY')
+    OPENAI_API_KEY = config('OPENAI_API_KEY')
 
 
 # Password validation
@@ -210,8 +230,4 @@ ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
 # デフォルトのメール送信元を設定
 DEFAULT_FROM_EMAIL = os.environ.get('FROM_EMAIL')
 
-SECRET_KEY = config('SECRET_KEY')
-
-DEBUG = config('DEBUG', default=False, cast=bool)
-
-OPENAI_API_KEY = config('OPENAI_API_KEY')
+MEDIA_URL = '/media/'
