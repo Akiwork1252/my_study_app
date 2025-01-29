@@ -7,6 +7,7 @@ from .services import generate_learning_plan
 
 
 # Create your views here.
+# 学習プランの作成
 class GenerateLearningPlanPreviewView(LoginRequiredMixin, View):
     def get(self, request, learning_goal_id):
         learning_goal = get_object_or_404(LearningGoal, id=learning_goal_id, 
@@ -22,4 +23,3 @@ class GenerateLearningPlanPreviewView(LoginRequiredMixin, View):
                        'learning_goal': learning_goal,
                        'learning_goal_id': learning_goal_id,
                        })
-

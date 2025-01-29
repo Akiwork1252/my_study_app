@@ -9,10 +9,7 @@
         <h1>{{ request.user.username }}  〜{{ learning_goal.title }}の学習履歴〜</h1>
     </div>
     <div>
-        <img src="{{ graph_path }}" alt="Progress Graph">
+        <img src="{{ MEDIA_URL }}{{ graph_path }}" alt="Progress Graph">
     </div>
 </div>
 {% endblock contents %}
-
-
-

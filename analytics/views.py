@@ -63,7 +63,9 @@ def show_total_score_graph(request, learning_goal_id):
         plt.savefig(output_path)
         plt.close()
 
-        graph_path = f'/static/graph/{user.username}-{learning_goal.title}_totalscore.png'
+        # graph_path = f'/static/graph/{user.username}-{learning_goal.title}_totalscore.png'
+        graph_filename = f'{user.username}-{learning_goal.title}_totalscore.png'
+        graph_path = os.path.join('graph', graph_filename)
     else:
         graph_path = None
 
@@ -112,7 +114,8 @@ def show_topic_score_graph(request, learning_goal_id):
         plt.savefig(output_path)
         plt.close()
 
-        graph_path = f'/static/graph/{user.username}-{learning_goal.title}_score.png'
+        graph_filename = f'{user.username}-{learning_goal.title}_score.png'
+        graph_path = os.path.join('graph', graph_filename)
     else:
         graph_path = None
 
