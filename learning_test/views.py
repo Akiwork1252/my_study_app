@@ -31,6 +31,10 @@ def _choice_test_score_abjustments(score, border=20):
 # テストチャット(選択問題)
 def choice_test_view(request, learning_goal_id):
     if request.method == 'GET':
+        # セッションのスコアをリセット
+        request.session.pop('total_score', None)
+        request.session['total_score'] = 0
+
         # クエリパラメータからtopicを取得
         topic = request.GET.get('topic')
         # セッションに保存(次の問題生成で利用)
